@@ -1,57 +1,50 @@
-import blobshape from 'blobshape';
-import { uniqueNamesGenerator, adjectives, animals } from 'unique-names-generator';
+// src/utils/util.ts
 
-// Note: this only works on the server side
-export function getNetlifyContext() {
-    return process.env.CONTEXT;
+/**
+ * Generate a random string of specified length
+ * @param length - Length of the random string
+ * @returns Random string
+ */
+export function generateRandomString(length: number): string {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    const charactersLength = characters.length;
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
 }
 
-export function randomInt(min: number, max: number) {
-    return Math.floor(Math.random() * (max - min + 1) + min);
+/**
+ * Validate email format
+ * @param email - Email to be validated
+ * @returns boolean indicating if email is valid
+ */
+export function validateEmail(email: string): boolean {
+    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@(([^<>()[\]\.\,;:\s@"]+\.)+[^<>()[\]\.\,;:\s@"]{2,})$/i;
+    return re.test(String(email).toLowerCase());
 }
 
-export function uniqueName() {
-    const config = {
-        dictionaries: [adjectives, animals],
-        separator: '-',
-        length: 2
-    };
-    return uniqueNamesGenerator(config) + '-' + randomInt(100, 999);
+/**
+ * Hash password
+ * @param password - Password to be hashed
+ * @returns hashed password
+ */
+import * as crypto from 'crypto';
+
+export function hashPassword(password: string): string {
+    const hash = crypto.createHash('sha256');
+    hash.update(password);
+    return hash.digest('hex');
 }
 
-export function generateBlob(parameters?: any) {
-    const gradientColors = [
-        ['#2E3192', '#1BFFFF'],
-        ['#93A5CF', '#E4EfE9'],
-        ['#BFF098', '#6FD6FF'],
-        ['#A1C4FD', '#C2E9FB'],
-        ['#11998E', '#38EF7D'],
-        ['#D8B5FF', '#1EAE98']
-    ];
-
-    parameters = {
-        seed: null,
-        size: 512,
-        edges: randomInt(3, 20),
-        growth: randomInt(2, 9),
-        name: uniqueName(),
-        colors: gradientColors[randomInt(0, gradientColors.length - 1)],
-        ...parameters
-    };
-    const { path: svgPath, seedValue: seed } = blobshape(parameters);
-    return { parameters: { ...parameters, seed }, svgPath };
+/**
+ * Check if password meets criteria
+ * @param password - Password to be checked
+ * @returns boolean indicating if password meets criteria
+ */
+export function validatePassword(password: string): boolean {
+    // Password must be at least 8 characters, include a number and a special character
+    const re = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+    return re.test(password);
 }
-
-export function cacheHeaders(maxAgeDays = 365, cacheTags?: string[]): Record<string, string> {
-    // As far as the browser is concerned, it must revalidate on every request.
-    // However, Netlify CDN is told to keep the content cached for up to maxAgeDays (note: new deployment bust the cache by default).
-    // We're also setting cache tags to be able to later purge via API (see: https://www.netlify.com/blog/cache-tags-and-purge-api-on-netlify/)
-    const headers = {
-        'Cache-Control': 'public, max-age=0, must-revalidate', // Tell browsers to always revalidate
-        'Netlify-CDN-Cache-Control': `public, max-age=${maxAgeDays * 86_400}, must-revalidate` // Tells Netlify CDN the max allwed cache duration
-    };
-    if (cacheTags?.length > 0) headers['Cache-Tag'] = cacheTags.join(',');
-    return headers;
-}
-
-export const uploadDisabled = import.meta.env.PUBLIC_DISABLE_UPLOADS?.toLowerCase() === 'true';
