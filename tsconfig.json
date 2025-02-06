@@ -1,7 +1,21 @@
 {
-  "extends": "astro/tsconfigs/base",
   "compilerOptions": {
-    "jsx": "react-jsx",
-    "jsxImportSource": "react"
+    "target": "ES6",                       // Specify ECMAScript target version
+    "module": "commonjs",                  // Specify module code generation
+    "strict": true,                        // Enable all strict type-checking options
+    "esModuleInterop": true,               // Enables emit interoperability between CommonJS and ES Modules
+    "forceConsistentCasingInFileNames": true,  // Disallow inconsistently-cased references to the same file
+    "skipLibCheck": true,                  // Skip type checking of declaration files
+    "moduleResolution": "node",            // Determine how modules get resolved
+    "resolveJsonModule": true,             // Include modules imported with .json extension
+    "isolatedModules": true,               // Ensure that each file can be transpiled in isolation
+    "jsx": "react",                        // Specify JSX code generation (use "react-jsx" for React 17+)
+    "baseUrl": ".",                        // Base directory to resolve non-absolute module names
+    "paths": {                             // Define module name aliases
+      "@components/*": ["src/components/*"],
+      "@pages/*": ["src/pages/*"]
+    }
+  },
+  "include": ["src"],                      // Specifies which files to include in the project
+  "exclude": ["node_modules"]              // Specifies which files to exclude from the project
   }
-}
