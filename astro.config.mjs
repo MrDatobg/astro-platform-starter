@@ -9,8 +9,8 @@ export default defineConfig({
         react(),
         tailwind({
             applyBaseStyles: false
-        })
+        }),
+        netlify()
     ],
-    output: 'hybrid',
-    adapter: netlify()
+    output: 'hybrid'
 });
